@@ -21,6 +21,14 @@
   ],
   "author": "Digital DaVinci",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ForkIt369/vibe-player.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ForkIt369/vibe-player/issues"
+  },
+  "homepage": "https://vibe-player-will31s-projects.vercel.app/",
   "devDependencies": {
     "vercel": "^39.2.2"
   }
