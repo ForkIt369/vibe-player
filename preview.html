@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vibe Player - Telegram Mini App Preview</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: #1a1a1a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
+      overflow: hidden;
+    }
+
+    /* Device Container */
+    .device-wrapper {
+      position: relative;
+      width: 390px;
+      height: 844px;
+      background: #000;
+      border-radius: 40px;
+      padding: 10px;
+      box-shadow: 
+        0 0 0 1px rgba(255, 255, 255, 0.1),
+        0 20px 40px rgba(0, 0, 0, 0.4),
+        0 40px 80px rgba(0, 0, 0, 0.6);
+    }
+
+    /* Screen */
+    .device-screen {
+      width: 100%;
+      height: 100%;
+      background: #0a0a0a;
+      border-radius: 30px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Status Bar */
+    .status-bar {
+      height: 44px;
+      background: #0a0a0a;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      font-size: 14px;
+      font-weight: 600;
+      color: white;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+    }
+
+    .status-left {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .status-right {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* Telegram Header */
+    .telegram-header {
+      position: absolute;
+      top: 44px;
+      left: 0;
+      right: 0;
+      height: 56px;
+      background: #212121;
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      z-index: 999;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .header-back {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #0088cc;
+      cursor: pointer;
+    }
+
+    .header-info {
+      flex: 1;
+      margin-left: 12px;
+    }
+
+    .header-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: white;
+    }
+
+    .header-subtitle {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.6);
+      margin-top: 2px;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 16px;
+    }
+
+    .header-action {
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: rgba(255, 255, 255, 0.8);
+      cursor: pointer;
+    }
+
+    /* Mini App Container */
+    .miniapp-container {
+      position: absolute;
+      top: 100px;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: #0a0a0a;
+      overflow: hidden;
+    }
+
+    .miniapp-iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    /* Device Details */
+    .notch {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 160px;
+      height: 30px;
+      background: #000;
+      border-radius: 0 0 20px 20px;
+      z-index: 1001;
+    }
+
+    /* Controls */
+    .controls {
+      position: absolute;
+      bottom: -60px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 20px;
+      align-items: center;
+    }
+
+    .control-btn {
+      padding: 8px 16px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      color: white;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 200ms ease;
+    }
+
+    .control-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .control-btn.active {
+      background: #0088cc;
+      border-color: #0088cc;
+    }
+
+    /* Device Selector */
+    .device-selector {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      display: flex;
+      gap: 10px;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 450px) {
+      .device-wrapper {
+        transform: scale(0.85);
+      }
+    }
+
+    @media (max-width: 380px) {
+      .device-wrapper {
+        transform: scale(0.7);
+      }
+    }
+
+    /* Android variant */
+    .device-wrapper.android {
+      border-radius: 20px;
+    }
+
+    .device-wrapper.android .device-screen {
+      border-radius: 12px;
+    }
+
+    .device-wrapper.android .notch {
+      display: none;
+    }
+
+    /* Theme variants */
+    .telegram-header.dark {
+      background: #212121;
+    }
+
+    .telegram-header.light {
+      background: #ffffff;
+      border-bottom-color: rgba(0, 0, 0, 0.08);
+    }
+
+    .telegram-header.light .header-title {
+      color: #000;
+    }
+
+    .telegram-header.light .header-subtitle {
+      color: rgba(0, 0, 0, 0.6);
+    }
+
+    .telegram-header.light .header-action {
+      color: rgba(0, 0, 0, 0.8);
+    }
+  </style>
+</head>
+<body>
+  <!-- Device Selector -->
+  <div class="device-selector">
+    <button class="control-btn active" onclick="setDevice('ios')">iPhone</button>
+    <button class="control-btn" onclick="setDevice('android')">Android</button>
+    <button class="control-btn" onclick="toggleTheme()">Toggle Theme</button>
+  </div>
+
+  <!-- Phone Container -->
+  <div class="device-wrapper" id="device">
+    <div class="device-screen">
+      <!-- iOS Notch -->
+      <div class="notch" id="notch"></div>
+      
+      <!-- Status Bar -->
+      <div class="status-bar">
+        <div class="status-left">
+          <span id="time">9:41</span>
+        </div>
+        <div class="status-right">
+          <svg width="16" height="12" viewBox="0 0 16 12" fill="white">
+            <path d="M1 4C3.5 2 5 1 8 1s4.5 1 7 3M4 7c1.5-1.5 2.5-2 4-2s2.5.5 4 2M7 10c.5-.5 1-1 1-1s.5.5 1 1"/>
+          </svg>
+          <svg width="16" height="12" viewBox="0 0 16 12" fill="white">
+            <path d="M2 4h10v6H2z"/>
+            <path d="M13 6v2"/>
+            <path d="M1 3h12v8H1z" fill="none" stroke="white"/>
+          </svg>
+        </div>
+      </div>
+      
+      <!-- Telegram Header -->
+      <div class="telegram-header dark" id="telegram-header">
+        <div class="header-back">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M15 18l-6-6 6-6"/>
+          </svg>
+        </div>
+        <div class="header-info">
+          <div class="header-title">Vibe Player</div>
+          <div class="header-subtitle">@VibePlayerBot</div>
+        </div>
+        <div class="header-actions">
+          <div class="header-action">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="1"/>
+              <circle cx="12" cy="5" r="1"/>
+              <circle cx="12" cy="19" r="1"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Mini App Container -->
+      <div class="miniapp-container">
+        <iframe src="index.html" class="miniapp-iframe" id="miniapp-frame"></iframe>
+      </div>
+    </div>
+  </div>
+
+  <!-- Controls -->
+  <div class="controls">
+    <button class="control-btn" onclick="reloadApp()">Reload App</button>
+    <button class="control-btn" onclick="toggleOrientation()">Rotate Device</button>
+  </div>
+
+  <script>
+    // Update time
+    function updateTime() {
+      const now = new Date();
+      const time = now.toLocaleTimeString('en-US', { 
+        hour: 'numeric', 
+        minute: '2-digit',
+        hour12: false 
+      });
+      document.getElementById('time').textContent = time;
+    }
+    
+    updateTime();
+    setInterval(updateTime, 1000);
+
+    // Device switching
+    function setDevice(type) {
+      const device = document.getElementById('device');
+      const notch = document.getElementById('notch');
+      
+      document.querySelectorAll('.device-selector .control-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      
+      if (type === 'ios') {
+        device.classList.remove('android');
+        notch.style.display = 'block';
+        event.target.classList.add('active');
+      } else {
+        device.classList.add('android');
+        notch.style.display = 'none';
+        event.target.classList.add('active');
+      }
+    }
+
+    // Theme switching
+    let isDark = true;
+    function toggleTheme() {
+      const header = document.getElementById('telegram-header');
+      isDark = !isDark;
+      
+      if (isDark) {
+        header.classList.remove('light');
+        header.classList.add('dark');
+      } else {
+        header.classList.remove('dark');
+        header.classList.add('light');
+      }
+    }
+
+    // Reload app
+    function reloadApp() {
+      const iframe = document.getElementById('miniapp-frame');
+      iframe.src = iframe.src;
+    }
+
+    // Toggle orientation
+    let isPortrait = true;
+    function toggleOrientation() {
+      const device = document.getElementById('device');
+      isPortrait = !isPortrait;
+      
+      if (!isPortrait) {
+        device.style.width = '844px';
+        device.style.height = '390px';
+      } else {
+        device.style.width = '390px';
+        device.style.height = '844px';
+      }
+    }
+
+    // Inject Telegram WebApp script into iframe
+    window.addEventListener('load', () => {
+      const iframe = document.getElementById('miniapp-frame');
+      iframe.addEventListener('load', () => {
+        try {
+          // Inject mock Telegram WebApp API
+          const script = iframe.contentDocument.createElement('script');
+          script.textContent = `
+            window.Telegram = {
+              WebApp: {
+                ready: () => console.log('Telegram WebApp ready'),
+                expand: () => console.log('Telegram WebApp expanded'),
+                close: () => console.log('Telegram WebApp closed'),
+                setHeaderColor: (color) => console.log('Header color:', color),
+                setBackgroundColor: (color) => console.log('Background color:', color),
+                showAlert: (message) => alert(message),
+                HapticFeedback: {
+                  impactOccurred: (style) => console.log('Haptic:', style),
+                  selectionChanged: () => console.log('Haptic: selection changed')
+                },
+                platform: 'ios',
+                version: '7.0',
+                initData: '',
+                initDataUnsafe: {},
+                colorScheme: 'dark',
+                themeParams: {
+                  bg_color: '#0a0a0a',
+                  text_color: '#ffffff',
+                  hint_color: '#999999',
+                  link_color: '#0088cc',
+                  button_color: '#0088cc',
+                  button_text_color: '#ffffff'
+                }
+              }
+            };
+          `;
+          iframe.contentDocument.head.insertBefore(script, iframe.contentDocument.head.firstChild);
+        } catch (e) {
+          console.log('Could not inject Telegram API:', e);
+        }
+      });
+    });
+  </script>
+</body>
+</html>

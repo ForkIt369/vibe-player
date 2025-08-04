@@ -1,0 +1,27 @@
+{
+  "name": "vibe-player",
+  "version": "1.0.0",
+  "description": "A high-performance audio visualizer built as a Telegram Mini App. Features 9 stunning visualization modes that react to your music in real-time.",
+  "main": "vibe-player-modular.js",
+  "type": "module",
+  "scripts": {
+    "deploy": "vercel --prod",
+    "dev": "vercel dev",
+    "open": "open index.html",
+    "test": "open test.html"
+  },
+  "keywords": [
+    "audio",
+    "visualizer",
+    "telegram",
+    "mini-app",
+    "web-audio",
+    "music",
+    "canvas"
+  ],
+  "author": "Digital DaVinci",
+  "license": "MIT",
+  "devDependencies": {
+    "vercel": "^39.2.2"
+  }
+}
