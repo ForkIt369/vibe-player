@@ -2,7 +2,9 @@
 
 A high-performance audio visualizer built as a Telegram Mini App. Features 9 stunning visualization modes that react to your music in real-time.
 
-**Live Demo:** https://vibe-player.vercel.app
+**Live Demo:** https://forkit369.github.io/vibe-player/standalone.html
+
+**GitHub Repo:** https://github.com/ForkIt369/vibe-player
 
 ## ✨ Features
 
