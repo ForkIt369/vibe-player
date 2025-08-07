@@ -2,53 +2,28 @@
   "version": 2,
   "buildCommand": "echo 'No build required'",
   "outputDirectory": ".",
-  "public": false,
   "functions": {
     "api/telegram-webhook.js": {
       "maxDuration": 10
     }
   },
-  "routes": [
+  "headers": [
     {
-      "src": "/api/telegram-webhook",
-      "dest": "/api/telegram-webhook.js"
-    },
-    {
-      "src": "^/$",
-      "dest": "/vibe-player-vanilla/index.html",
-      "headers": {
-        "Cache-Control": "no-cache, no-store, must-revalidate",
-        "Content-Type": "text/html; charset=utf-8",
-        "X-Frame-Options": "ALLOWALL"
-      }
-    },
-    {
-      "src": "^/(.+\\.js)$",
-      "dest": "/vibe-player-vanilla/$1",
-      "headers": {
-        "Cache-Control": "no-cache, no-store, must-revalidate",
-        "Content-Type": "application/javascript; charset=utf-8"
-      }
-    },
-    {
-      "src": "^/(.+\\.css)$",
-      "dest": "/vibe-player-vanilla/$1",
-      "headers": {
-        "Cache-Control": "no-cache, no-store, must-revalidate", 
-        "Content-Type": "text/css; charset=utf-8"
-      }
-    },
-    {
-      "src": "^/(.+\\.html)$",
-      "dest": "/vibe-player-vanilla/$1",
-      "headers": {
-        "Cache-Control": "no-cache, no-store, must-revalidate",
-        "Content-Type": "text/html; charset=utf-8"
-      }
-    },
-    {
-      "src": "^/(.+)$",
-      "dest": "/vibe-player-vanilla/$1"
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, no-store, must-revalidate"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "ALLOWALL"
+        },
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        }
+      ]
     }
   ]
 }
