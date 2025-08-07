@@ -1,7 +1,9 @@
 {
   "version": 2,
-  "cleanUrls": true,
+  "cleanUrls": false,
   "trailingSlash": false,
+  "buildCommand": "echo 'No build required'",
+  "outputDirectory": ".",
   "functions": {
     "api/telegram-webhook.js": {
       "maxDuration": 10
@@ -13,8 +15,12 @@
       "destination": "/api/telegram-webhook.js"
     },
     {
-      "source": "/(.*)",
-      "destination": "/vibe-player-vanilla/$1"
+      "source": "/",
+      "destination": "/vibe-player-vanilla/index.html"
+    },
+    {
+      "source": "/:path*",
+      "destination": "/vibe-player-vanilla/:path*"
     }
   ],
   "headers": [
