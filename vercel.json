@@ -1,10 +1,24 @@
 {
+  "version": 2,
   "cleanUrls": true,
   "trailingSlash": false,
+  "functions": {
+    "api/telegram-webhook.js": {
+      "maxDuration": 10
+    }
+  },
   "rewrites": [
     {
-      "source": "/(.*)",
-      "destination": "/$1"
+      "source": "/api/telegram-webhook",
+      "destination": "/api/telegram-webhook.js"
+    },
+    {
+      "source": "/vibe-player-vanilla/(.*)",
+      "destination": "/vibe-player-vanilla/$1"
+    },
+    {
+      "source": "/",
+      "destination": "/vibe-player-vanilla/index.html"
     }
   ],
   "headers": [
@@ -13,13 +27,51 @@
       "headers": [
         {
           "key": "Content-Type",
-          "value": "application/javascript"
+          "value": "application/javascript; charset=utf-8"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
         }
       ]
     },
     {
-      "source": "/(.*)",
+      "source": "/(.*).css",
       "headers": [
+        {
+          "key": "Content-Type",
+          "value": "text/css; charset=utf-8"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/(.*).html",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "text/html; charset=utf-8"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, no-store, must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/vibe-player-vanilla/(.*)",
+      "headers": [
+        {
+          "key": "X-Frame-Options",
+          "value": "ALLOWALL"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
         {
           "key": "Access-Control-Allow-Origin",
           "value": "*"
@@ -27,8 +79,41 @@
         {
           "key": "Access-Control-Allow-Methods",
           "value": "GET, POST, PUT, DELETE, OPTIONS"
+        },
+        {
+          "key": "Access-Control-Allow-Headers",
+          "value": "Content-Type, Authorization, X-Requested-With"
+        },
+        {
+          "key": "Access-Control-Allow-Credentials",
+          "value": "true"
+        },
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self' https://telegram.org blob: data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://telegram.org; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; media-src 'self' blob: data:; connect-src 'self' https://telegram.org https://*.telegram.org wss://*.telegram.org blob: data:; frame-ancestors https://web.telegram.org https://webk.telegram.org https://webz.telegram.org;"
+        }
+      ]
+    },
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Frame-Options",
+          "value": "ALLOWALL"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "no-referrer-when-downgrade"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "accelerometer=*, camera=(), geolocation=(), gyroscope=*, magnetometer=*, microphone=(), payment=(), usb=()"
         }
       ]
     }
-  ]
+  ],
+  "env": {
+    "TELEGRAM_BOT_TOKEN": "@telegram-bot-token",
+    "APP_URL": "@app-url"
+  }
 }
