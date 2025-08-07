@@ -24,6 +24,11 @@ class UIController {
   }
   
   initializeElements() {
+    // Header
+    this.elements.headerBar = document.getElementById('header-bar');
+    this.elements.backBtn = document.getElementById('back-btn');
+    this.elements.menuBtn = document.getElementById('menu-btn');
+    
     // Containers
     this.elements.uploadContainer = document.getElementById('upload-container');
     this.elements.playerContainer = document.getElementById('player-container');
@@ -66,6 +71,9 @@ class UIController {
   }
   
   setupEventListeners() {
+    // Header buttons
+    this.setupHeaderButtons();
+    
     // File upload
     this.setupFileUpload();
     
@@ -89,6 +97,79 @@ class UIController {
     
     // Performance monitor callbacks
     this.setupPerformanceCallbacks();
+  }
+  
+  setupHeaderButtons() {
+    // Back button
+    if (this.elements.backBtn) {
+      this.elements.backBtn.addEventListener('click', () => {
+        if (this.tg) {
+          // If in Telegram, use their back method
+          this.tg.close();
+        } else if (this.elements.playerContainer.classList.contains('active')) {
+          // If player is active, go back to upload
+          this.showUploadScreen();
+        } else {
+          // Otherwise try to go back in browser history
+          window.history.back();
+        }
+      });
+    }
+    
+    // Menu button
+    if (this.elements.menuBtn) {
+      this.elements.menuBtn.addEventListener('click', () => {
+        // Toggle menu or show options
+        this.showMenu();
+      });
+    }
+  }
+  
+  showUploadScreen() {
+    this.elements.uploadContainer.classList.remove('hidden');
+    this.elements.playerContainer.classList.remove('active');
+    
+    // Stop visualization if running
+    if (this.visualizer) {
+      this.visualizer.stop();
+    }
+    
+    // Pause audio if playing
+    if (this.audioProcessor && !this.audioProcessor.audio.paused) {
+      this.audioProcessor.pause();
+    }
+  }
+  
+  showMenu() {
+    // Create a simple menu (could be expanded)
+    const menuOptions = [
+      { label: 'Reset Player', action: () => this.resetPlayer() },
+      { label: 'About', action: () => this.showAbout() }
+    ];
+    
+    // For now just reset the player
+    this.resetPlayer();
+  }
+  
+  resetPlayer() {
+    // Stop everything
+    if (this.audioProcessor) {
+      this.audioProcessor.stop();
+    }
+    if (this.visualizer) {
+      this.visualizer.stop();
+    }
+    
+    // Reset UI
+    this.showUploadScreen();
+    this.elements.fileInput.value = '';
+    
+    // Show toast
+    this.showError('Player reset', 2000);
+  }
+  
+  showAbout() {
+    this.showError('Vibe Player v1.0 - Audio Visualizer', 3000);
   }
   
   setupFileUpload() {

@@ -70,6 +70,54 @@ body {
   position: relative;
 }
 
+/* Header Bar */
+.header-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--space-md);
+  height: 56px;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
+  z-index: 1000;
+}
+
+.back-btn, .menu-btn {
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: transparent;
+  color: var(--text-primary);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.back-btn:hover, .menu-btn:hover {
+  background: var(--bg-tertiary);
+}
+
+.back-btn:active, .menu-btn:active {
+  transform: scale(0.95);
+}
+
+.back-btn svg, .menu-btn svg {
+  width: 24px;
+  height: 24px;
+}
+
+.header-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+  flex: 1;
+  text-align: center;
+}
+
 /* Loading Overlay */
 .loading-overlay {
   position: fixed;
