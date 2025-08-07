@@ -25,7 +25,7 @@
   ],
   "headers": [
     {
-      "source": "/(.*).js",
+      "source": "/vibe-player-vanilla/(.*).js",
       "headers": [
         {
           "key": "Content-Type",
@@ -33,12 +33,12 @@
         },
         {
           "key": "Cache-Control",
-          "value": "public, max-age=31536000, immutable"
+          "value": "no-cache, no-store, must-revalidate"
         }
       ]
     },
     {
-      "source": "/(.*).css",
+      "source": "/vibe-player-vanilla/(.*).css",
       "headers": [
         {
           "key": "Content-Type",
@@ -46,12 +46,12 @@
         },
         {
           "key": "Cache-Control",
-          "value": "public, max-age=31536000, immutable"
+          "value": "no-cache, no-store, must-revalidate"
         }
       ]
     },
     {
-      "source": "/(.*).html",
+      "source": "/vibe-player-vanilla/(.*).html",
       "headers": [
         {
           "key": "Content-Type",
