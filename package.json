@@ -4,7 +4,8 @@
   "description": "Vibe Player - Audio Visualizer Telegram Mini App",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
+    "build": "echo 'No build required'",
+    "start": "echo 'Static site'",
     "dev": "nodemon server.js",
     "setup-bot": "node bot-setup.js",
     "deploy": "vercel --prod",
