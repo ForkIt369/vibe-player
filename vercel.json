@@ -2,6 +2,7 @@
   "version": 2,
   "buildCommand": "echo 'No build required'",
   "outputDirectory": ".",
+  "public": true,
   "functions": {
     "api/telegram-webhook.js": {
       "maxDuration": 10
