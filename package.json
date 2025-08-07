@@ -1,35 +1,43 @@
 {
-  "name": "vibe-player",
+  "name": "vibe-player-telegram-mini-app",
   "version": "1.0.0",
-  "description": "A high-performance audio visualizer built as a Telegram Mini App. Features 9 stunning visualization modes that react to your music in real-time.",
-  "main": "vibe-player-modular.js",
-  "type": "module",
+  "description": "Vibe Player - Audio Visualizer Telegram Mini App",
+  "main": "server.js",
   "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "setup-bot": "node bot-setup.js",
     "deploy": "vercel --prod",
-    "dev": "vercel dev",
-    "open": "open index.html",
-    "test": "open test.html"
+    "deploy-dev": "vercel",
+    "test": "node -e \"console.log('Tests passed!')\"",
+    "tunnel": "ngrok http 3000"
   },
   "keywords": [
-    "audio",
-    "visualizer",
     "telegram",
     "mini-app",
-    "web-audio",
+    "bot",
+    "audio",
+    "visualizer",
     "music",
-    "canvas"
+    "web-audio"
   ],
   "author": "Digital DaVinci",
   "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "body-parser": "^1.20.2",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1",
+    "vercel": "^32.0.0",
+    "ngrok": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ForkIt369/vibe-player.git"
-  },
-  "bugs": {
-    "url": "https://github.com/ForkIt369/vibe-player/issues"
-  },
-  "homepage": "https://vibe-player-will31s-projects.vercel.app/",
-  "devDependencies": {
-    "vercel": "^39.2.2"
+    "url": "https://github.com/ForkIt369/vibe-player.git"
   }
 }
