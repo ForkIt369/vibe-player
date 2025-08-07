@@ -13,12 +13,8 @@
       "destination": "/api/telegram-webhook.js"
     },
     {
-      "source": "/vibe-player-vanilla/(.*)",
+      "source": "/(.*)",
       "destination": "/vibe-player-vanilla/$1"
-    },
-    {
-      "source": "/",
-      "destination": "/vibe-player-vanilla/index.html"
     }
   ],
   "headers": [
