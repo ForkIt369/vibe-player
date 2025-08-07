@@ -14,7 +14,7 @@ class TelegramBotConfig {
     }
     
     // Bot configuration
-    this.BOT_USERNAME = '@VibePlayerBot'; // Update with your bot username
+    this.BOT_USERNAME = '@VibeVizDemobot'; // Update with your bot username
     this.APP_URL = process.env.APP_URL || 'https://vibe-player-flame.vercel.app';
     
     // Telegram API endpoints

@@ -5,9 +5,8 @@ A high-performance audio visualizer built as a Telegram Mini App. Features 9 stu
 ## 🚀 Live Links
 
 - **Telegram Bot:** [@VibeVizDemobot](https://t.me/VibeVizDemobot)
-- **Production App:** https://vibe-player.vercel.app
+- **Production App:** https://vibe-player-flame.vercel.app
 - **GitHub Repo:** https://github.com/ForkIt369/vibe-player
-- **Debug Tool:** https://vibe-player.vercel.app/vibe-player-vanilla/debug-audio.html
 
 ## ✨ Features
 
