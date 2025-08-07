@@ -31,8 +31,7 @@
   },
   "devDependencies": {
     "nodemon": "^3.0.1",
-    "vercel": "^32.0.0",
-    "ngrok": "^5.0.0"
+    "vercel": "^32.0.0"
   },
   "engines": {
     "node": ">=16.0.0"
