@@ -52,7 +52,25 @@ class Visualizer {
     
     // Canvas setup
     this.resizeCanvas();
-    window.addEventListener('resize', () => this.resizeCanvas());
+    
+    // Debounced resize handler for better mobile performance
+    let resizeTimeout = null;
+    const handleResize = () => {
+      if (resizeTimeout) clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(() => {
+        this.resizeCanvas();
+      }, 100);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    window.addEventListener('orientationchange', handleResize);
+    
+    // Also listen for visibility changes (important for mobile)
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) {
+        this.resizeCanvas();
+      }
+    });
   }
   
   initParticlePool() {
@@ -83,14 +101,32 @@ class Visualizer {
   
   resizeCanvas() {
     const dpr = window.devicePixelRatio || 1;
-    const rect = this.canvas.getBoundingClientRect();
-    this.canvas.width = rect.width * dpr;
-    this.canvas.height = rect.height * dpr;
+    
+    // Get parent container dimensions instead of using getBoundingClientRect
+    const parent = this.canvas.parentElement;
+    if (!parent) return;
+    
+    // Use offsetWidth/offsetHeight for more reliable sizing on mobile
+    const width = parent.offsetWidth || parent.clientWidth;
+    const height = parent.offsetHeight || parent.clientHeight;
+    
+    // Ensure minimum dimensions
+    if (width <= 0 || height <= 0) return;
+    
+    // Set canvas dimensions
+    this.canvas.width = width * dpr;
+    this.canvas.height = height * dpr;
+    
+    // Set CSS dimensions
+    this.canvas.style.width = width + 'px';
+    this.canvas.style.height = height + 'px';
+    
+    // Scale context for device pixel ratio
     this.ctx.scale(dpr, dpr);
     
-    // Update canvas logical size
-    this.width = rect.width;
-    this.height = rect.height;
+    // Update logical size
+    this.width = width;
+    this.height = height;
   }
   
   start() {
