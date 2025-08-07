@@ -111,9 +111,5 @@
         }
       ]
     }
-  ],
-  "env": {
-    "TELEGRAM_BOT_TOKEN": "@telegram-bot-token",
-    "APP_URL": "@app-url"
-  }
+  ]
 }
