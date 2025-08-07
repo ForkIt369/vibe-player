@@ -27,6 +27,11 @@ yarn-error.log*
 # OS
 Thumbs.db
 
+# Credentials - NEVER commit
+CREDENTIALS.md
+.env
+.env.*
+
 # Audio test files
 *.mp3
 *.wav
