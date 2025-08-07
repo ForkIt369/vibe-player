@@ -15,7 +15,7 @@ class TelegramBotConfig {
     
     // Bot configuration
     this.BOT_USERNAME = '@VibePlayerBot'; // Update with your bot username
-    this.APP_URL = process.env.APP_URL || 'https://vibe-player.vercel.app';
+    this.APP_URL = process.env.APP_URL || 'https://vibe-player-flame.vercel.app';
     
     // Telegram API endpoints
     this.TELEGRAM_API = `https://api.telegram.org/bot${this.BOT_TOKEN}`;
@@ -23,7 +23,7 @@ class TelegramBotConfig {
     // Mini App configuration
     this.MINI_APP_CONFIG = {
       web_app: {
-        url: `${this.APP_URL}/vibe-player-vanilla/`,
+        url: `${this.APP_URL}/`,
         name: 'Vibe Player',
         description: 'Audio Visualizer with 9 stunning modes'
       }
@@ -54,7 +54,7 @@ class TelegramBotConfig {
       type: 'web_app',
       text: '🎵 Open Vibe Player',
       web_app: {
-        url: `${this.APP_URL}/vibe-player-vanilla/`
+        url: `${this.APP_URL}/`
       }
     };
   }
@@ -260,7 +260,7 @@ class TelegramBotConfig {
               inline_keyboard: [[
                 {
                   text: '🚀 Launch Vibe Player',
-                  web_app: { url: `${this.APP_URL}/vibe-player-vanilla/` }
+                  web_app: { url: `${this.APP_URL}/` }
                 }
               ]]
             }
@@ -308,7 +308,7 @@ class TelegramBotConfig {
               inline_keyboard: [[
                 {
                   text: '🚀 Open Mini App',
-                  web_app: { url: `${this.APP_URL}/vibe-player-vanilla/` }
+                  web_app: { url: `${this.APP_URL}/` }
                 }
               ]]
             }
