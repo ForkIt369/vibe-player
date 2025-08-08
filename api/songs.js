@@ -1,7 +1,7 @@
 // Vercel Serverless Function to serve songs from Blob Storage
 // This endpoint provides the song library data with Blob URLs
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   // Enable CORS for the Telegram Mini App
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
@@ -89,4 +89,4 @@ export default async function handler(req, res) {
   
   // Return the song library
   return res.status(200).json(songLibrary);
-}
+};
