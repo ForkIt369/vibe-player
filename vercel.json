@@ -6,6 +6,9 @@
   "functions": {
     "api/telegram-webhook.js": {
       "maxDuration": 10
+    },
+    "api/songs.js": {
+      "maxDuration": 10
     }
   },
   "headers": [
