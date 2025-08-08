@@ -15,13 +15,64 @@ class PlaylistManager {
   
   async loadSongLibrary() {
     try {
-      // Fetch from static JSON file
-      const response = await fetch('/songs-blob.json');
-      if (!response.ok) {
-        throw new Error('Failed to fetch song library');
-      }
-      
-      this.songLibrary = await response.json();
+      // Use embedded song library with Blob Storage URLs
+      this.songLibrary = {
+        featured: {
+          title: "Global Concepts",
+          artist: "Robert DeLong",
+          url: "https://9ulba2tadygajeby.public.blob.vercel-storage.com/Robert_DeLong-Global_Concepts-N6mHksyR7BewGlW7oJGMSAM7aILCy2.mp3",
+          duration: "3:42",
+          genre: "Electronic",
+          visualization: "neon"
+        },
+        library: [
+          {
+            id: "chlorine",
+            title: "Chlorine",
+            artist: "twenty one pilots",
+            url: "https://9ulba2tadygajeby.public.blob.vercel-storage.com/Twenty_One_Pilots-Chlorine-8bHVBBUZkpKFxCWNLRGJE0jKyD6Bkl.mp3",
+            duration: "5:24",
+            genre: "Alternative",
+            visualization: "particles"
+          },
+          {
+            id: "11minutes",
+            title: "11 Minutes",
+            artist: "YUNGBLUD, Halsey ft. Travis Barker",
+            url: "https://9ulba2tadygajeby.public.blob.vercel-storage.com/YUNGBLUD_Halsey-11_Minutes-xaykyRQGTILcj9bkXC0FLhf6VUAjBr.mp3",
+            duration: "3:41",
+            genre: "Rock",
+            visualization: "fractal"
+          },
+          {
+            id: "gasoline",
+            title: "Gasoline",
+            artist: "Halsey",
+            url: "https://9ulba2tadygajeby.public.blob.vercel-storage.com/Halsey-Gasoline-2GF0XJ8TJcSKQxVHqiMhcJUMSJX1EW.mp3",
+            duration: "3:17",
+            genre: "Electropop",
+            visualization: "dna"
+          },
+          {
+            id: "high-enough",
+            title: "High Enough",
+            artist: "K.Flay",
+            url: "https://9ulba2tadygajeby.public.blob.vercel-storage.com/K_Flay-High_Enough-cJdxFRFxCBN7cCvzBOGZCGcKDN6VMs.mp3",
+            duration: "3:50",
+            genre: "Alternative",
+            visualization: "wave"
+          },
+          {
+            id: "zen",
+            title: "Zen",
+            artist: "X Ambassadors, K.Flay, grandson",
+            url: "https://9ulba2tadygajeby.public.blob.vercel-storage.com/X_Ambassadors_K_Flay-Zen-vGwKrYZFUcrLUV1k6KjRyZWnQuMvCB.mp3",
+            duration: "3:37",
+            genre: "Alternative Rock",
+            visualization: "bars"
+          }
+        ]
+      };
       return this.songLibrary;
     } catch (error) {
       console.error('Error loading song library:', error);
