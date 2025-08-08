@@ -112,12 +112,8 @@ class VibePlayer {
   
   async loadPreloadedSong() {
     try {
-      // Fetch song library from Vercel Blob storage
-      const baseUrl = window.location.hostname === 'localhost' 
-        ? 'http://localhost:3000' 
-        : '';
-      
-      const response = await fetch(`${baseUrl}/api/songs`);
+      // Fetch song library from static JSON (works around Vercel API issues)
+      const response = await fetch('/songs-blob.json');
       if (!response.ok) {
         throw new Error('Failed to fetch song library');
       }

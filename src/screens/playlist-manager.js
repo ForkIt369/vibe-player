@@ -15,11 +15,8 @@ class PlaylistManager {
   
   async loadSongLibrary() {
     try {
-      const baseUrl = window.location.hostname === 'localhost' 
-        ? 'http://localhost:3000' 
-        : '';
-      
-      const response = await fetch(`${baseUrl}/api/songs`);
+      // Fetch from static JSON file
+      const response = await fetch('/songs-blob.json');
       if (!response.ok) {
         throw new Error('Failed to fetch song library');
       }
