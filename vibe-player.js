@@ -111,43 +111,40 @@ class VibePlayer {
   }
   
   async loadPreloadedSong() {
-    // Check for preloaded song URL in data attributes or config
-    const preloadUrl = document.body.dataset.preloadSong || 
-                      window.VIBE_PLAYER_CONFIG?.defaultSong ||
-                      'audio/default-song.mp3'; // Default path for bundled song
-    
-    if (preloadUrl && preloadUrl !== 'none') {
-      try {
-        // For local development or when served from a web server
-        if (window.location.protocol === 'file:') {
-          // Local file system - show instructions
-          console.log('Local file system detected. Preloading requires a web server.');
-          console.log('Run: python3 -m http.server 8000');
-          console.log('Then visit: http://localhost:8000');
-          
-          // Update UI to show instructions
-          const uploadZone = document.getElementById('upload-zone');
-          if (uploadZone) {
-            const uploadText = uploadZone.querySelector('.upload-text');
-            if (uploadText) {
-              uploadText.innerHTML = `
-                <span class="upload-icon">🎵</span>
-                <span>Preloaded song ready</span>
-                <span class="upload-hint">Run local server to auto-load</span>
-              `;
-            }
-          }
-          return;
-        }
+    try {
+      // Fetch song library from Vercel Blob storage
+      const baseUrl = window.location.hostname === 'localhost' 
+        ? 'http://localhost:3000' 
+        : '';
+      
+      const response = await fetch(`${baseUrl}/api/songs`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch song library');
+      }
+      
+      const songData = await response.json();
+      
+      // Store song library for playlist functionality
+      this.songLibrary = songData;
+      
+      // Load featured song
+      if (songData.featured && songData.featured.url) {
+        const songUrl = songData.featured.url;
+        const songResponse = await fetch(songUrl);
         
-        // Try to load the preloaded song from web server
-        const response = await fetch(preloadUrl);
-        if (response.ok) {
-          const blob = await response.blob();
-          const file = new File([blob], 'Robert DeLong - Global Concepts.mp3', { type: 'audio/mpeg' });
+        if (songResponse.ok) {
+          const blob = await songResponse.blob();
+          const fileName = `${songData.featured.artist} - ${songData.featured.title}.mp3`;
+          const file = new File([blob], fileName, { type: 'audio/mpeg' });
           
           // Auto-load but don't auto-play (user interaction required for audio)
           this.loadAudioFile(file);
+          
+          // Set the visualization type
+          if (songData.featured.visualization) {
+            this.currentVisualization = songData.featured.visualization;
+            this.updateVisualizationButton();
+          }
           
           // Update UI to show preloaded song
           const uploadZone = document.getElementById('upload-zone');
@@ -157,15 +154,45 @@ class VibePlayer {
               uploadText.innerHTML = `
                 <span class="upload-icon">🎵</span>
                 <span>Track loaded - Click to play</span>
-                <span class="upload-hint">Robert DeLong - Global Concepts</span>
+                <span class="upload-hint">${songData.featured.artist} - ${songData.featured.title}</span>
               `;
             }
           }
         }
-      } catch (error) {
-        console.log('Could not load preloaded song:', error);
-        console.log('Continuing with normal upload flow');
       }
+    } catch (error) {
+      console.log('Using local fallback for preloaded songs');
+      // Fallback to local files if Blob storage is not available
+      this.loadLocalPreloadedSong();
+    }
+  }
+  
+  async loadLocalPreloadedSong() {
+    // Fallback method for local development
+    const preloadUrl = 'audio/Robert_DeLong-Global_Concepts.mp3';
+    
+    try {
+      const response = await fetch(preloadUrl);
+      if (response.ok) {
+        const blob = await response.blob();
+        const file = new File([blob], 'Robert DeLong - Global Concepts.mp3', { type: 'audio/mpeg' });
+        
+        this.loadAudioFile(file);
+        
+        const uploadZone = document.getElementById('upload-zone');
+        if (uploadZone) {
+          const uploadText = uploadZone.querySelector('.upload-text');
+          if (uploadText) {
+            uploadText.innerHTML = `
+              <span class="upload-icon">🎵</span>
+              <span>Track loaded - Click to play</span>
+              <span class="upload-hint">Robert DeLong - Global Concepts</span>
+            `;
+          }
+        }
+      }
+    } catch (error) {
+      console.log('Could not load local preloaded song:', error);
     }
   }
   
