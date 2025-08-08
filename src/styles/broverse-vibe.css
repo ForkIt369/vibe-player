@@ -1,0 +1,541 @@
+/**
+ * Vibe Player - BroVerse Design System Integration
+ * Applies BroVerse design language to Vibe Player
+ */
+
+/* Import BroVerse Design Tokens */
+:root {
+  /* Avatar Colors */
+  --bigsis-primary: #00D4FF;
+  --bigsis-secondary: #0051D5;
+  --bigsis-glow: rgba(0, 212, 255, 0.3);
+  
+  --bro-primary: #FF9500;
+  --bro-secondary: #FF6B00;
+  --bro-glow: rgba(255, 149, 0, 0.3);
+  
+  --lilsis-primary: #9D4EDD;
+  --lilsis-secondary: #7B2CBF;
+  --lilsis-glow: rgba(157, 78, 221, 0.3);
+  
+  --cbo-primary: #30D158;
+  --cbo-secondary: #00C851;
+  --cbo-glow: rgba(48, 209, 88, 0.3);
+
+  /* Background Colors */
+  --bg-primary: #0D1117;
+  --bg-secondary: #161B22;
+  --bg-tertiary: #21262D;
+  
+  /* Glass Effects */
+  --glass-bg: rgba(255, 255, 255, 0.02);
+  --glass-bg-hover: rgba(255, 255, 255, 0.04);
+  --glass-border: rgba(255, 255, 255, 0.05);
+  --glass-border-hover: rgba(255, 255, 255, 0.08);
+  
+  /* Text Colors */
+  --text-primary: #FFFFFF;
+  --text-secondary: rgba(255, 255, 255, 0.8);
+  --text-tertiary: rgba(255, 255, 255, 0.6);
+  --text-muted: rgba(255, 255, 255, 0.4);
+  
+  /* Gradients */
+  --gradient-brand: linear-gradient(135deg, #512FC9, #00E0FF);
+  --gradient-bigsis: linear-gradient(135deg, #00D4FF, #0051D5);
+  --gradient-bro: linear-gradient(135deg, #FF9500, #FF6B00);
+  --gradient-lilsis: linear-gradient(135deg, #9D4EDD, #7B2CBF);
+  --gradient-cbo: linear-gradient(135deg, #30D158, #00C851);
+  
+  /* Typography */
+  --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+  --font-mono: 'JetBrains Mono', 'SF Mono', 'Monaco', 'Inconsolata', monospace;
+  
+  /* Spacing Scale */
+  --space-1: 8px;
+  --space-2: 16px;
+  --space-3: 24px;
+  --space-4: 32px;
+  --space-5: 40px;
+  --space-6: 48px;
+  
+  /* Border Radius */
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-xl: 28px;
+  --radius-full: 9999px;
+  
+  /* Shadows & Glows */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.15);
+  --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.2);
+  
+  --glow-sm: 0 0 20px var(--glow-color, currentColor);
+  --glow-md: 0 0 40px var(--glow-color, currentColor);
+  --glow-lg: 0 0 60px var(--glow-color, currentColor);
+  
+  /* Animation */
+  --ease-default: cubic-bezier(0.4, 0, 0.2, 1);
+  --duration-base: 300ms;
+  
+  /* Effects */
+  --backdrop-blur: 40px;
+}
+
+/* Global Reset with BroVerse Style */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-primary);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* BroVerse Glass Card */
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--backdrop-blur));
+  -webkit-backdrop-filter: blur(var(--backdrop-blur));
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-3);
+  transition: all var(--duration-base) var(--ease-default);
+}
+
+.glass-card:hover {
+  background: var(--glass-bg-hover);
+  border-color: var(--glass-border-hover);
+  transform: translateY(-2px);
+}
+
+/* BroVerse Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-3);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+  letter-spacing: 0.02em;
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all var(--duration-base) var(--ease-default);
+  position: relative;
+  overflow: hidden;
+  white-space: nowrap;
+  text-decoration: none;
+  outline: none;
+}
+
+.btn-primary {
+  background: var(--gradient-brand);
+  color: var(--text-primary);
+  box-shadow: 0 4px 20px rgba(81, 47, 201, 0.25);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 30px rgba(81, 47, 201, 0.35);
+}
+
+.btn-glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--backdrop-blur));
+  border: 1px solid var(--glass-border);
+  color: var(--text-primary);
+}
+
+.btn-glass:hover {
+  background: var(--glass-bg-hover);
+  border-color: var(--glass-border-hover);
+  transform: translateY(-2px);
+}
+
+/* Avatar Theme Buttons */
+.btn-bigsis {
+  background: var(--bigsis-primary);
+  color: var(--text-primary);
+}
+
+.btn-bigsis:hover {
+  background: var(--bigsis-secondary);
+  box-shadow: 0 0 30px var(--bigsis-glow);
+  transform: translateY(-2px);
+}
+
+.btn-bro {
+  background: var(--bro-primary);
+  color: var(--text-primary);
+}
+
+.btn-bro:hover {
+  background: var(--bro-secondary);
+  box-shadow: 0 0 30px var(--bro-glow);
+  transform: translateY(-2px);
+}
+
+.btn-lilsis {
+  background: var(--lilsis-primary);
+  color: var(--text-primary);
+}
+
+.btn-lilsis:hover {
+  background: var(--lilsis-secondary);
+  box-shadow: 0 0 30px var(--lilsis-glow);
+  transform: translateY(-2px);
+}
+
+.btn-cbo {
+  background: var(--cbo-primary);
+  color: var(--text-primary);
+}
+
+.btn-cbo:hover {
+  background: var(--cbo-secondary);
+  box-shadow: 0 0 30px var(--cbo-glow);
+  transform: translateY(-2px);
+}
+
+/* Vibe Player Specific - Intro Screen */
+.intro-screen {
+  background: radial-gradient(circle at center, var(--bg-secondary) 0%, var(--bg-primary) 100%);
+}
+
+.intro-logo {
+  position: relative;
+  z-index: 1;
+}
+
+.app-title {
+  font-size: 3rem;
+  font-weight: 800;
+  background: var(--gradient-brand);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+}
+
+.app-tagline {
+  color: var(--text-tertiary);
+  font-size: 1.1rem;
+  margin-top: var(--space-1);
+}
+
+/* Avatar Wave Animations */
+.wave-circle {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  animation: wave-expand 3s ease-out infinite;
+}
+
+.wave-circle:nth-child(1) {
+  border: 2px solid var(--bigsis-primary);
+  animation-delay: 0s;
+}
+
+.wave-circle:nth-child(2) {
+  border: 2px solid var(--bro-primary);
+  animation-delay: 1s;
+}
+
+.wave-circle:nth-child(3) {
+  border: 2px solid var(--lilsis-primary);
+  animation-delay: 2s;
+}
+
+@keyframes wave-expand {
+  0% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+
+/* Library Screen with BroVerse Style */
+.library-screen {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.library-header {
+  background: linear-gradient(180deg, var(--bg-primary) 70%, transparent);
+  padding: var(--space-4) var(--space-2) var(--space-2);
+  text-align: center;
+}
+
+.library-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  background: var(--gradient-brand);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Featured Card with Avatar Theme */
+.featured-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--backdrop-blur));
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-3);
+  position: relative;
+  overflow: hidden;
+}
+
+.featured-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--gradient-bigsis);
+}
+
+.featured-card:hover {
+  background: var(--glass-bg-hover);
+  border-color: var(--bigsis-primary);
+  box-shadow: 0 0 40px var(--bigsis-glow);
+}
+
+/* Track Cards with Avatar Themes */
+.track-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-2);
+  cursor: pointer;
+  transition: all var(--duration-base) var(--ease-default);
+  position: relative;
+  overflow: hidden;
+}
+
+.track-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--gradient-brand);
+  opacity: 0;
+  transition: opacity var(--duration-base);
+}
+
+.track-card:hover::before {
+  opacity: 0.05;
+}
+
+.track-card:hover {
+  transform: translateY(-4px) scale(1.02);
+  border-color: var(--glass-border-hover);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+}
+
+/* Track card avatar themes */
+.track-card[data-theme="bigsis"]:hover {
+  border-color: var(--bigsis-primary);
+  box-shadow: 0 0 30px var(--bigsis-glow);
+}
+
+.track-card[data-theme="bro"]:hover {
+  border-color: var(--bro-primary);
+  box-shadow: 0 0 30px var(--bro-glow);
+}
+
+.track-card[data-theme="lilsis"]:hover {
+  border-color: var(--lilsis-primary);
+  box-shadow: 0 0 30px var(--lilsis-glow);
+}
+
+.track-card[data-theme="cbo"]:hover {
+  border-color: var(--cbo-primary);
+  box-shadow: 0 0 30px var(--cbo-glow);
+}
+
+/* Visualization Icons with Avatar Colors */
+.track-viz-icon {
+  font-size: 2.5rem;
+  margin-bottom: var(--space-1);
+  background: var(--gradient-brand);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Upload Zone with BroVerse Style */
+.upload-zone {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--backdrop-blur));
+  border: 2px dashed var(--glass-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  transition: all var(--duration-base) var(--ease-default);
+  cursor: pointer;
+}
+
+.upload-zone:hover {
+  background: var(--glass-bg-hover);
+  border-color: var(--gradient-brand);
+  border-style: solid;
+  transform: scale(1.02);
+}
+
+.upload-zone.drag-over {
+  background: var(--glass-bg-hover);
+  border-color: var(--bigsis-primary);
+  box-shadow: 0 0 40px var(--bigsis-glow);
+}
+
+/* Player Controls with BroVerse Glass */
+.controls {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--backdrop-blur));
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-2);
+  margin: var(--space-2);
+}
+
+/* Visualization Selector with Avatar Themes */
+.viz-btn {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--backdrop-blur));
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--duration-base) var(--ease-default);
+  font-size: 1.5rem;
+  color: var(--text-secondary);
+}
+
+.viz-btn:hover {
+  background: var(--glass-bg-hover);
+  border-color: var(--glass-border-hover);
+  transform: translateY(-2px);
+  color: var(--text-primary);
+}
+
+.viz-btn.active {
+  background: var(--gradient-brand);
+  border-color: transparent;
+  color: var(--text-primary);
+  box-shadow: 0 4px 20px rgba(81, 47, 201, 0.3);
+}
+
+/* Progress Bar with Avatar Gradient */
+.progress-bar {
+  background: var(--gradient-brand);
+  height: 4px;
+  border-radius: var(--radius-full);
+  box-shadow: 0 0 20px rgba(81, 47, 201, 0.5);
+}
+
+/* Now Playing with Glass Effect */
+.now-playing {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--backdrop-blur));
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-2);
+  margin: var(--space-2);
+  text-align: center;
+}
+
+/* Header Bar with BroVerse Style */
+.header-bar {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--backdrop-blur));
+  border-bottom: 1px solid var(--glass-border);
+  padding: var(--space-2);
+}
+
+/* Loading Spinner with Avatar Colors */
+@keyframes spin-gradient {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-spinner {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    var(--bigsis-primary),
+    var(--bro-primary),
+    var(--lilsis-primary),
+    var(--cbo-primary),
+    var(--bigsis-primary)
+  );
+  animation: spin-gradient 1s linear infinite;
+  position: relative;
+}
+
+.loading-spinner::before {
+  content: '';
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  right: 4px;
+  bottom: 4px;
+  background: var(--bg-primary);
+  border-radius: 50%;
+}
+
+/* Theme Classes for Dynamic Avatar Switching */
+.theme-bigsis {
+  --accent-primary: var(--bigsis-primary);
+  --accent-secondary: var(--bigsis-secondary);
+  --accent-glow: var(--bigsis-glow);
+  --accent-gradient: var(--gradient-bigsis);
+}
+
+.theme-bro {
+  --accent-primary: var(--bro-primary);
+  --accent-secondary: var(--bro-secondary);
+  --accent-glow: var(--bro-glow);
+  --accent-gradient: var(--gradient-bro);
+}
+
+.theme-lilsis {
+  --accent-primary: var(--lilsis-primary);
+  --accent-secondary: var(--lilsis-secondary);
+  --accent-glow: var(--lilsis-glow);
+  --accent-gradient: var(--gradient-lilsis);
+}
+
+.theme-cbo {
+  --accent-primary: var(--cbo-primary);
+  --accent-secondary: var(--cbo-secondary);
+  --accent-glow: var(--cbo-glow);
+  --accent-gradient: var(--gradient-cbo);
+}

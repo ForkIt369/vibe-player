@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
+  <meta name="theme-color" content="#0a0a0a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://telegram.org; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; media-src 'self' blob: data:;">
+  <title>Vibe Player - Audio Visualizer</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles-mobile.css">
+  <link rel="stylesheet" href="src/styles/broverse-vibe.css">
+  <script>
+    // Configuration for preloaded song
+    window.VIBE_PLAYER_CONFIG = {
+      // Option 1: Use a local file in the audio folder
+      defaultSong: 'audio/default-song.mp3',
+      
+      // Option 2: Use an external URL (uncomment to use)
+      // defaultSong: 'https://example.com/songs/robert-delong-global-concepts.mp3',
+      
+      // Option 3: Set to 'none' to disable preloading
+      // defaultSong: 'none'
+    };
+  </script>
+</head>
+<body data-preload-song="audio/default-song.mp3">
+  <div class="app" id="app">
+    <!-- Header Bar -->
+    <div class="header-bar" id="header-bar">
+      <button class="back-btn" id="back-btn">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+        </svg>
+      </button>
+      <h1 class="header-title app-title">Vibe Player</h1>
+      <button class="menu-btn" id="menu-btn">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <circle cx="12" cy="5" r="2"/>
+          <circle cx="12" cy="12" r="2"/>
+          <circle cx="12" cy="19" r="2"/>
+        </svg>
+      </button>
+    </div>
+    
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loading">
+      <div class="loading-spinner"></div>
+      <div class="loading-text">Loading...</div>
+    </div>
+
+    <!-- Upload Container -->
+    <div class="upload-container" id="upload-container">
+      <div class="upload-zone" id="upload-zone">
+        <div class="upload-icon">🎵</div>
+        <div class="upload-text">
+          <div class="upload-title">Drop Your Music</div>
+          <div class="upload-subtitle">or click to browse</div>
+        </div>
+        <input type="file" id="file-input" accept="audio/*" hidden>
+      </div>
+      <div class="upload-info">
+        <p>Supports MP3, WAV, OGG, M4A</p>
+        <p>Max file size: 50MB</p>
+      </div>
+    </div>
+
+    <!-- Player Container -->
+    <div class="player-container" id="player-container">
+      <!-- Visualizer Canvas -->
+      <div class="visualizer">
+        <canvas id="visualizer-canvas"></canvas>
+        <div class="fps-counter" id="fps-counter">60 FPS</div>
+      </div>
+
+      <!-- Track Info -->
+      <div class="track-info">
+        <div class="track-title" id="track-title">No Track</div>
+        <div class="track-artist" id="track-artist">-</div>
+      </div>
+
+      <!-- Progress Bar -->
+      <div class="progress-container">
+        <div class="progress-time" id="current-time">0:00</div>
+        <div class="progress-bar" id="progress-bar">
+          <div class="progress-fill" id="progress-fill"></div>
+          <div class="progress-handle" id="progress-handle"></div>
+        </div>
+        <div class="progress-time" id="total-time">0:00</div>
+      </div>
+
+      <!-- Player Controls -->
+      <div class="player-controls">
+        <button class="control-btn btn btn-glass" id="prev-btn" title="Previous">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/>
+          </svg>
+        </button>
+        
+        <button class="control-btn play-btn btn btn-glass" id="play-pause-btn" title="Play/Pause">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M8 5v14l11-7z"/>
+          </svg>
+        </button>
+        
+        <button class="control-btn btn btn-glass" id="next-btn" title="Next">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Bottom Bar -->
+      <div class="bottom-bar">
+        <button class="icon-btn" id="viz-btn" title="Visualizations">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <rect x="4" y="11" width="3" height="10"/>
+            <rect x="9" y="7" width="3" height="14"/>
+            <rect x="14" y="4" width="3" height="17"/>
+            <rect x="19" y="9" width="3" height="12"/>
+          </svg>
+        </button>
+        
+        <button class="icon-btn" id="quality-btn" title="Quality">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+          </svg>
+        </button>
+        
+        <button class="icon-btn" id="share-btn" title="Share">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Visualization Selector -->
+    <div class="viz-selector glass-card" id="viz-selector">
+      <div class="viz-grid">
+        <button class="viz-option viz-btn active" data-viz="bars" title="Bars">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <rect x="4" y="11" width="3" height="10"/>
+            <rect x="9" y="7" width="3" height="14"/>
+            <rect x="14" y="4" width="3" height="17"/>
+            <rect x="19" y="9" width="3" height="12"/>
+          </svg>
+          <span>Bars</span>
+        </button>
+        
+        <button class="viz-option viz-btn" data-viz="wave" title="Wave">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M2 12c0-2 2-4 4-4s4 2 4 4-2 4-4 4-4-2-4-4zm6 0c0-2 2-4 4-4s4 2 4 4-2 4-4 4-4-2-4-4zm6 0c0-2 2-4 4-4s4 2 4 4-2 4-4 4-4-2-4-4z"/>
+          </svg>
+          <span>Wave</span>
+        </button>
+        
+        <button class="viz-option viz-btn" data-viz="circle" title="Circle">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/>
+            <circle cx="12" cy="12" r="3"/>
+          </svg>
+          <span>Circle</span>
+        </button>
+        
+        <button class="viz-option viz-btn" data-viz="particles" title="Particles">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <circle cx="12" cy="5" r="2"/>
+            <circle cx="5" cy="12" r="2"/>
+            <circle cx="19" cy="12" r="2"/>
+            <circle cx="12" cy="19" r="2"/>
+            <circle cx="7" cy="7" r="1"/>
+            <circle cx="17" cy="7" r="1"/>
+            <circle cx="7" cy="17" r="1"/>
+            <circle cx="17" cy="17" r="1"/>
+          </svg>
+          <span>Particles</span>
+        </button>
+        
+        <button class="viz-option viz-btn" data-viz="galaxy" title="Galaxy">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+            <path d="M12 6c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm0 10c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z"/>
+          </svg>
+          <span>Galaxy</span>
+        </button>
+        
+        <button class="viz-option viz-btn" data-viz="dna" title="DNA">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M4 2v20h2V12h2v10h2V12h2v10h2V12h2v10h2V12h2V2h-2v8h-2V2h-2v8h-2V2H10v8H8V2H6v8H4V2z"/>
+          </svg>
+          <span>DNA</span>
+        </button>
+        
+        <button class="viz-option viz-btn" data-viz="ribbons" title="Ribbons">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M2 7c0-1.1.9-2 2-2h16c1.1 0 2 .9 2 2v10c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V7zm2 0v10h16V7H4z"/>
+          </svg>
+          <span>Ribbons</span>
+        </button>
+        
+        <button class="viz-option viz-btn" data-viz="fractal" title="Fractal">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2l2 7h7l-5.5 4 2 7-5.5-4-5.5 4 2-7L3 9h7z"/>
+          </svg>
+          <span>Fractal</span>
+        </button>
+        
+        <button class="viz-option viz-btn" data-viz="neonGrid" title="Neon Grid">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M3 3v18h18V3H3zm16 16H5V5h14v14zM7 7h10v10H7V7zm2 2v6h6V9H9z"/>
+          </svg>
+          <span>Grid</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Quality Selector -->
+    <div class="quality-selector" id="quality-selector">
+      <div class="quality-options">
+        <button class="quality-option" data-quality="ultra">Ultra</button>
+        <button class="quality-option active" data-quality="high">High</button>
+        <button class="quality-option" data-quality="medium">Medium</button>
+        <button class="quality-option" data-quality="low">Low</button>
+        <button class="quality-option" data-quality="auto">Auto</button>
+      </div>
+    </div>
+
+    <!-- Share Menu -->
+    <div class="share-menu" id="share-menu">
+      <div class="share-options">
+        <button class="share-option" data-action="snapshot">
+          <span>📸</span>
+          <span>Snapshot</span>
+        </button>
+        <button class="share-option" data-action="record">
+          <span>🎥</span>
+          <span>Record</span>
+        </button>
+        <button class="share-option" data-action="telegram">
+          <span>✈️</span>
+          <span>Telegram</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Error Toast -->
+    <div class="error-toast" id="error-toast">
+      <span id="error-message"></span>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="audio-processor.js"></script>
+  <script src="performance.js"></script>
+  <script src="visualizer.js"></script>
+  <script src="ui-controller.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

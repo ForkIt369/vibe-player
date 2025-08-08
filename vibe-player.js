@@ -51,6 +51,9 @@ class VibePlayer {
     this.time = 0;
     this.ribbons = [];
     
+    // Preloaded song configuration
+    this.preloadedSongUrl = null; // Will be set if a default song is configured
+    
     this.init();
   }
   
@@ -102,6 +105,68 @@ class VibePlayer {
     
     // Set up share menu
     this.setupShareMenu();
+    
+    // Load preloaded song if configured
+    this.loadPreloadedSong();
+  }
+  
+  async loadPreloadedSong() {
+    // Check for preloaded song URL in data attributes or config
+    const preloadUrl = document.body.dataset.preloadSong || 
+                      window.VIBE_PLAYER_CONFIG?.defaultSong ||
+                      'audio/default-song.mp3'; // Default path for bundled song
+    
+    if (preloadUrl && preloadUrl !== 'none') {
+      try {
+        // For local development or when served from a web server
+        if (window.location.protocol === 'file:') {
+          // Local file system - show instructions
+          console.log('Local file system detected. Preloading requires a web server.');
+          console.log('Run: python3 -m http.server 8000');
+          console.log('Then visit: http://localhost:8000');
+          
+          // Update UI to show instructions
+          const uploadZone = document.getElementById('upload-zone');
+          if (uploadZone) {
+            const uploadText = uploadZone.querySelector('.upload-text');
+            if (uploadText) {
+              uploadText.innerHTML = `
+                <span class="upload-icon">🎵</span>
+                <span>Preloaded song ready</span>
+                <span class="upload-hint">Run local server to auto-load</span>
+              `;
+            }
+          }
+          return;
+        }
+        
+        // Try to load the preloaded song from web server
+        const response = await fetch(preloadUrl);
+        if (response.ok) {
+          const blob = await response.blob();
+          const file = new File([blob], 'Robert DeLong - Global Concepts.mp3', { type: 'audio/mpeg' });
+          
+          // Auto-load but don't auto-play (user interaction required for audio)
+          this.loadAudioFile(file);
+          
+          // Update UI to show preloaded song
+          const uploadZone = document.getElementById('upload-zone');
+          if (uploadZone) {
+            const uploadText = uploadZone.querySelector('.upload-text');
+            if (uploadText) {
+              uploadText.innerHTML = `
+                <span class="upload-icon">🎵</span>
+                <span>Track loaded - Click to play</span>
+                <span class="upload-hint">Robert DeLong - Global Concepts</span>
+              `;
+            }
+          }
+        }
+      } catch (error) {
+        console.log('Could not load preloaded song:', error);
+        console.log('Continuing with normal upload flow');
+      }
+    }
   }
   
   resizeCanvas() {
@@ -110,6 +175,76 @@ class VibePlayer {
     this.canvas.width = rect.width * dpr;
     this.canvas.height = rect.height * dpr;
     this.ctx.scale(dpr, dpr);
+  }
+  
+  async loadFile(filePath) {
+    try {
+      // Show loading
+      document.getElementById('loading').classList.add('show');
+      
+      // Create audio element
+      if (this.audio) {
+        this.audio.pause();
+        if (this.audio.src.startsWith('blob:')) {
+          URL.revokeObjectURL(this.audio.src);
+        }
+      }
+      
+      this.audio = new Audio();
+      this.audio.src = filePath;
+      this.audio.crossOrigin = 'anonymous';
+      
+      // Wait for metadata
+      await new Promise((resolve, reject) => {
+        this.audio.addEventListener('loadedmetadata', resolve, { once: true });
+        this.audio.addEventListener('error', reject, { once: true });
+      });
+      
+      // Create audio context if needed
+      if (!this.audioContext) {
+        this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        this.analyser = this.audioContext.createAnalyser();
+        this.analyser.fftSize = 256;
+        this.analyser.smoothingTimeConstant = this.settings.smoothing;
+      }
+      
+      // Connect audio to analyser
+      if (this.source) {
+        this.source.disconnect();
+      }
+      this.source = this.audioContext.createMediaElementSource(this.audio);
+      this.source.connect(this.analyser);
+      this.analyser.connect(this.audioContext.destination);
+      
+      // Hide upload zone
+      document.getElementById('upload-zone').style.display = 'none';
+      
+      // Setup audio events
+      this.audio.addEventListener('ended', () => {
+        this.stop();
+      });
+      
+      // Update time display
+      this.audio.addEventListener('timeupdate', () => {
+        this.updateProgress();
+      });
+      
+      // Hide loading
+      document.getElementById('loading').classList.remove('show');
+      
+      // Start playing
+      this.play();
+      
+      // Start animation
+      if (!this.animationId) {
+        this.animate();
+      }
+      
+    } catch (error) {
+      console.error('Error loading audio file:', error);
+      document.getElementById('loading').classList.remove('show');
+      throw error;
+    }
   }
   
   async loadAudioFile(file) {
@@ -240,20 +375,39 @@ class VibePlayer {
     }
   }
   
+  stop() {
+    if (this.audio) {
+      this.audio.pause();
+      this.audio.currentTime = 0;
+      this.isPlaying = false;
+      this.updatePlayPauseButton();
+    }
+    if (this.animationId) {
+      cancelAnimationFrame(this.animationId);
+      this.animationId = null;
+    }
+  }
+  
   updatePlayPauseButton() {
-    const btn = document.getElementById('play-pause-btn');
-    if (this.isPlaying) {
-      btn.innerHTML = `
-        <svg viewBox="0 0 24 24" fill="currentColor">
-          <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/>
-        </svg>
-      `;
+    const playIcon = document.getElementById('play-icon');
+    const pauseIcon = document.getElementById('pause-icon');
+    
+    if (playIcon && pauseIcon) {
+      if (this.isPlaying) {
+        playIcon.style.display = 'none';
+        pauseIcon.style.display = 'inline';
+      } else {
+        playIcon.style.display = 'inline';
+        pauseIcon.style.display = 'none';
+      }
     } else {
-      btn.innerHTML = `
-        <svg viewBox="0 0 24 24" fill="currentColor">
-          <path d="M8 5v14l11-7z"/>
-        </svg>
-      `;
+      // Fallback if icons aren't found
+      const btn = document.getElementById('play-pause-btn');
+      if (btn) {
+        btn.innerHTML = this.isPlaying ? 
+          '<i class="fas fa-pause"></i>' : 
+          '<i class="fas fa-play"></i>';
+      }
     }
   }
   

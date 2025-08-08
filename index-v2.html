@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#0a0a0a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Vibe Player - Audio Visualizer</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles-mobile.css">
+  <link rel="stylesheet" href="src/styles/screens.css">
+  <link rel="stylesheet" href="src/styles/broverse-vibe.css">
+  
+  <script>
+    // Song library data (fallback for local file system)
+    window.SONG_DATA = {
+      "featured": {
+        "title": "Global Concepts",
+        "artist": "Robert DeLong",
+        "url": "audio/Robert DeLong - Global Concepts.mp3",
+        "duration": "3:42",
+        "genre": "Electronic",
+        "visualization": "neon"
+      },
+      "library": [
+        {
+          "id": "chlorine",
+          "title": "Chlorine",
+          "artist": "twenty one pilots",
+          "url": "audio/twenty one pilots - Chlorine (Official Video).mp3",
+          "duration": "5:24",
+          "genre": "Alternative",
+          "visualization": "particles"
+        },
+        {
+          "id": "11minutes",
+          "title": "11 Minutes",
+          "artist": "YUNGBLUD, Halsey",
+          "url": "audio/YUNGBLUD, Halsey - 11 Minutes (Official Video) ft. Travis Barker.mp3",
+          "duration": "3:41",
+          "genre": "Rock",
+          "visualization": "fractal"
+        },
+        {
+          "id": "gasoline",
+          "title": "Gasoline",
+          "artist": "Halsey",
+          "url": "audio/Halsey - Gasoline (Audio).mp3",
+          "duration": "3:17",
+          "genre": "Electropop",
+          "visualization": "dna"
+        },
+        {
+          "id": "high-enough",
+          "title": "High Enough",
+          "artist": "K.Flay",
+          "url": "audio/K.Flay - High Enough (Lyric Video).mp3",
+          "duration": "3:50",
+          "genre": "Alternative",
+          "visualization": "wave"
+        },
+        {
+          "id": "zen",
+          "title": "Zen",
+          "artist": "X Ambassadors, K.Flay",
+          "url": "audio/X Ambassadors, K.Flay, grandson - Zen.mp3",
+          "duration": "3:37",
+          "genre": "Alternative Rock",
+          "visualization": "bars"
+        },
+        {
+          "id": "handlebars",
+          "title": "Handlebars",
+          "artist": "Flobots",
+          "url": "audio/Flobots - Handlebars (Official Video).mp3",
+          "duration": "3:31",
+          "genre": "Hip Hop",
+          "visualization": "particles"
+        }
+      ]
+    };
+  </script>
+</head>
+<body>
+  <!-- Original App (Hidden by default, shown when player is active) -->
+  <div class="app" id="app" style="display: none;">
+    <!-- Header Bar -->
+    <div class="header-bar" id="header-bar">
+      <button class="back-btn" id="back-btn">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+        </svg>
+      </button>
+      <h1 class="header-title">Vibe Player</h1>
+      <button class="menu-btn" id="menu-btn">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <circle cx="12" cy="5" r="2"/>
+          <circle cx="12" cy="12" r="2"/>
+          <circle cx="12" cy="19" r="2"/>
+        </svg>
+      </button>
+    </div>
+    
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loading">
+      <div class="loading-spinner"></div>
+      <p class="loading-text">Loading audio...</p>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Canvas Container -->
+      <div class="canvas-container">
+        <canvas id="visualizer-canvas"></canvas>
+        
+        <!-- Upload Zone -->
+        <div class="upload-zone" id="upload-zone">
+          <div class="upload-content">
+            <div class="upload-text">
+              <span class="upload-icon">🎵</span>
+              <span>Drop Your Music</span>
+              <span class="upload-hint">or click to browse</span>
+            </div>
+          </div>
+          <input type="file" id="file-input" accept="audio/*" style="display: none;">
+        </div>
+      </div>
+
+      <!-- Now Playing Info -->
+      <div class="now-playing" id="now-playing" style="display: none;">
+        <h2 class="now-playing-title">Track Title</h2>
+        <p class="now-playing-artist">Artist Name</p>
+      </div>
+
+      <!-- Progress Bar -->
+      <div class="progress-container" id="progress-container" style="display: none;">
+        <div class="progress-bar" id="progress-bar"></div>
+        <div class="progress-info">
+          <span class="time-current" id="time-current">0:00</span>
+          <span class="time-total" id="time-total">0:00</span>
+        </div>
+      </div>
+
+      <!-- Controls -->
+      <div class="controls glass-card" id="controls" style="display: none;">
+        <button class="control-btn btn btn-glass" id="play-btn">
+          <svg class="play-icon" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M8 5v14l11-7z"/>
+          </svg>
+          <svg class="pause-icon" viewBox="0 0 24 24" fill="currentColor" style="display: none;">
+            <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+          </svg>
+        </button>
+        
+        <div class="volume-control">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+          </svg>
+          <input type="range" id="volume-slider" min="0" max="100" value="70">
+        </div>
+      </div>
+
+      <!-- Visualization Selector -->
+      <div class="visualization-selector glass-card" id="visualization-selector" style="display: none;">
+        <div class="viz-grid">
+          <button class="viz-btn active" data-viz="bars">▐█▌</button>
+          <button class="viz-btn" data-viz="wave">∿∿∿</button>
+          <button class="viz-btn" data-viz="circle">◉</button>
+          <button class="viz-btn" data-viz="particles">∘∘</button>
+          <button class="viz-btn" data-viz="galaxy">✦</button>
+          <button class="viz-btn" data-viz="dna">∞</button>
+          <button class="viz-btn" data-viz="ribbons">~~</button>
+          <button class="viz-btn" data-viz="fractal">❋</button>
+          <button class="viz-btn" data-viz="neon">▦▦</button>
+        </div>
+        <p class="viz-name" id="viz-name">Bars</p>
+      </div>
+
+      <!-- Share Menu -->
+      <div class="share-menu" id="share-menu" style="display: none;">
+        <button class="share-btn" id="record-btn">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <circle cx="12" cy="12" r="8" fill="red"/>
+          </svg>
+          <span>Record</span>
+        </button>
+        <button class="share-btn" id="telegram-btn">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/>
+          </svg>
+          <span>Share</span>
+        </button>
+        <button class="share-btn" id="download-btn">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+          </svg>
+          <span>Save</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobile-menu">
+      <div class="menu-header">
+        <h3>Settings</h3>
+        <button class="close-menu-btn" id="close-menu-btn">✕</button>
+      </div>
+      <div class="menu-content">
+        <div class="menu-item">
+          <span>Quality</span>
+          <select id="quality-select">
+            <option value="auto">Auto</option>
+            <option value="high">High</option>
+            <option value="medium">Medium</option>
+            <option value="low">Low</option>
+          </select>
+        </div>
+        <div class="menu-item">
+          <span>FPS Limit</span>
+          <select id="fps-select">
+            <option value="60">60 FPS</option>
+            <option value="30">30 FPS</option>
+            <option value="24">24 FPS</option>
+          </select>
+        </div>
+        <div class="menu-item">
+          <span>About</span>
+          <p class="menu-description">Vibe Player v2.0 - Audio Visualizer for Telegram</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Screens will be added dynamically by app-controller.js -->
+  
+  <!-- Load Scripts -->
+  <script src="vibe-player.js"></script>
+  <script src="src/screens/app-controller.js"></script>
+</body>
+</html>

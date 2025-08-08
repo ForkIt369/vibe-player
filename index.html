@@ -2,248 +2,638 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="theme-color" content="#0a0a0a">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://telegram.org; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; media-src 'self' blob: data:;">
   <title>Vibe Player - Audio Visualizer</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="styles-mobile.css">
+  <link rel="stylesheet" href="src/styles/broverse-vibe.css">
+  <style>
+    /* Quick fixes for icons and layout */
+    .screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: none;
+      z-index: 100;
+      background: var(--bg-primary, #0a0a0a);
+    }
+    
+    .screen.active {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .playlist-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+    }
+    
+    .playlist-header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    
+    .playlist-title {
+      font-size: 2.5rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #512FC9, #00E0FF);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 10px;
+    }
+    
+    .playlist-subtitle {
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 1rem;
+    }
+    
+    .track-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+    
+    .track-item {
+      background: rgba(255, 255, 255, 0.02);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 16px;
+      padding: 16px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    
+    .track-item:hover {
+      background: rgba(255, 255, 255, 0.04);
+      border-color: var(--bro-primary);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(255, 149, 0, 0.2);
+    }
+    
+    .track-icon {
+      font-size: 2rem;
+      min-width: 40px;
+      text-align: center;
+    }
+    
+    .track-info {
+      flex: 1;
+    }
+    
+    .track-name {
+      font-weight: 600;
+      font-size: 1.1rem;
+      color: #fff;
+      margin-bottom: 4px;
+    }
+    
+    .track-artist {
+      font-size: 0.9rem;
+      color: rgba(255, 255, 255, 0.6);
+    }
+    
+    .track-duration {
+      color: rgba(255, 255, 255, 0.4);
+      font-size: 0.9rem;
+    }
+    
+    .start-btn {
+      padding: 16px 40px;
+      font-size: 1.2rem;
+      font-weight: 600;
+      background: linear-gradient(135deg, #FF9500, #FF6B00);
+      border: none;
+      border-radius: 28px;
+      color: white;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 20px rgba(255, 149, 0, 0.3);
+    }
+    
+    .start-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 30px rgba(255, 149, 0, 0.4);
+    }
+    
+    .nav-header {
+      background: rgba(255, 255, 255, 0.02);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .back-button {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 1.5rem;
+      cursor: pointer;
+      padding: 8px;
+      transition: opacity 0.3s;
+    }
+    
+    .back-button:hover {
+      opacity: 0.7;
+    }
+    
+    .nav-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: white;
+    }
+    
+    .upload-section {
+      margin: 30px 20px;
+      text-align: center;
+    }
+    
+    .upload-btn {
+      background: rgba(255, 255, 255, 0.02);
+      backdrop-filter: blur(20px);
+      border: 2px dashed rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 30px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-block;
+    }
+    
+    .upload-btn:hover {
+      background: rgba(255, 255, 255, 0.04);
+      border-color: var(--bigsis-primary);
+      box-shadow: 0 0 30px rgba(0, 212, 255, 0.2);
+    }
+    
+    .upload-icon {
+      font-size: 3rem;
+      margin-bottom: 10px;
+    }
+    
+    .upload-text {
+      color: rgba(255, 255, 255, 0.8);
+      font-weight: 500;
+    }
+  </style>
 </head>
 <body>
-  <div class="app" id="app">
-    <!-- Header Bar -->
+  <!-- Main Player App (Hidden initially) -->
+  <div class="app" id="app" style="display: none;">
     <div class="header-bar" id="header-bar">
-      <button class="back-btn" id="back-btn">
-        <svg viewBox="0 0 24 24" fill="currentColor">
-          <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
-        </svg>
+      <button class="back-btn" id="back-to-playlist">
+        <i class="fas fa-chevron-left"></i>
       </button>
-      <h1 class="header-title">Vibe Player</h1>
+      <h1 class="header-title app-title">Vibe Player</h1>
       <button class="menu-btn" id="menu-btn">
-        <svg viewBox="0 0 24 24" fill="currentColor">
-          <circle cx="12" cy="5" r="2"/>
-          <circle cx="12" cy="12" r="2"/>
-          <circle cx="12" cy="19" r="2"/>
-        </svg>
+        <i class="fas fa-ellipsis-v"></i>
       </button>
     </div>
     
-    <!-- Loading Overlay -->
     <div class="loading-overlay" id="loading">
       <div class="loading-spinner"></div>
-      <div class="loading-text">Loading...</div>
+      <p class="loading-text">Loading audio...</p>
     </div>
 
-    <!-- Upload Container -->
-    <div class="upload-container" id="upload-container">
-      <div class="upload-zone" id="upload-zone">
-        <div class="upload-icon">🎵</div>
-        <div class="upload-text">
-          <div class="upload-title">Drop Your Music</div>
-          <div class="upload-subtitle">or click to browse</div>
-        </div>
-        <input type="file" id="file-input" accept="audio/*" hidden>
-      </div>
-      <div class="upload-info">
-        <p>Supports MP3, WAV, OGG, M4A</p>
-        <p>Max file size: 50MB</p>
-      </div>
-    </div>
-
-    <!-- Player Container -->
-    <div class="player-container" id="player-container">
-      <!-- Visualizer Canvas -->
-      <div class="visualizer">
+    <div class="main-content">
+      <div class="canvas-container">
         <canvas id="visualizer-canvas"></canvas>
-        <div class="fps-counter" id="fps-counter">60 FPS</div>
       </div>
 
-      <!-- Track Info -->
       <div class="track-info">
         <div class="track-title" id="track-title">No Track</div>
         <div class="track-artist" id="track-artist">-</div>
       </div>
 
-      <!-- Progress Bar -->
-      <div class="progress-container">
-        <div class="progress-time" id="current-time">0:00</div>
+      <div class="progress-bar-container">
         <div class="progress-bar" id="progress-bar">
           <div class="progress-fill" id="progress-fill"></div>
-          <div class="progress-handle" id="progress-handle"></div>
         </div>
-        <div class="progress-time" id="total-time">0:00</div>
+        <div class="time-display">
+          <span id="time-current">0:00</span>
+          <span id="time-total">0:00</span>
+        </div>
       </div>
 
-      <!-- Player Controls -->
       <div class="player-controls">
-        <button class="control-btn" id="prev-btn" title="Previous">
-          <svg viewBox="0 0 24 24" fill="currentColor">
-            <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/>
-          </svg>
+        <button class="control-btn btn btn-glass" id="prev-btn" title="Previous">
+          <i class="fas fa-backward"></i>
         </button>
         
-        <button class="control-btn play-btn" id="play-pause-btn" title="Play/Pause">
-          <svg viewBox="0 0 24 24" fill="currentColor">
-            <path d="M8 5v14l11-7z"/>
-          </svg>
+        <button class="control-btn play-btn btn btn-glass" id="play-pause-btn" title="Play/Pause">
+          <i class="fas fa-play" id="play-icon"></i>
+          <i class="fas fa-pause" id="pause-icon" style="display: none;"></i>
         </button>
         
-        <button class="control-btn" id="next-btn" title="Next">
-          <svg viewBox="0 0 24 24" fill="currentColor">
-            <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/>
-          </svg>
+        <button class="control-btn btn btn-glass" id="next-btn" title="Next">
+          <i class="fas fa-forward"></i>
         </button>
       </div>
-
-      <!-- Bottom Bar -->
-      <div class="bottom-bar">
-        <button class="icon-btn" id="viz-btn" title="Visualizations">
-          <svg viewBox="0 0 24 24" fill="currentColor">
-            <rect x="4" y="11" width="3" height="10"/>
-            <rect x="9" y="7" width="3" height="14"/>
-            <rect x="14" y="4" width="3" height="17"/>
-            <rect x="19" y="9" width="3" height="12"/>
-          </svg>
-        </button>
-        
-        <button class="icon-btn" id="quality-btn" title="Quality">
-          <svg viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-          </svg>
-        </button>
-        
-        <button class="icon-btn" id="share-btn" title="Share">
-          <svg viewBox="0 0 24 24" fill="currentColor">
-            <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/>
-          </svg>
-        </button>
+      
+      <div class="volume-control">
+        <i class="fas fa-volume-up"></i>
+        <input type="range" id="volume-slider" min="0" max="100" value="70">
       </div>
     </div>
 
-    <!-- Visualization Selector -->
-    <div class="viz-selector" id="viz-selector">
+    <div class="viz-selector glass-card" id="viz-selector">
       <div class="viz-grid">
-        <button class="viz-option active" data-viz="bars" title="Bars">
-          <svg viewBox="0 0 24 24" fill="currentColor">
-            <rect x="4" y="11" width="3" height="10"/>
-            <rect x="9" y="7" width="3" height="14"/>
-            <rect x="14" y="4" width="3" height="17"/>
-            <rect x="19" y="9" width="3" height="12"/>
-          </svg>
-          <span>Bars</span>
+        <button class="viz-option viz-btn active" data-viz="bars" title="Bars">
+          <i class="fas fa-chart-bar"></i>
         </button>
-        
-        <button class="viz-option" data-viz="wave" title="Wave">
-          <svg viewBox="0 0 24 24" fill="currentColor">
-            <path d="M2 12c0-2 2-4 4-4s4 2 4 4-2 4-4 4-4-2-4-4zm6 0c0-2 2-4 4-4s4 2 4 4-2 4-4 4-4-2-4-4zm6 0c0-2 2-4 4-4s4 2 4 4-2 4-4 4-4-2-4-4z"/>
-          </svg>
-          <span>Wave</span>
+        <button class="viz-option viz-btn" data-viz="wave" title="Wave">
+          <i class="fas fa-water"></i>
         </button>
-        
-        <button class="viz-option" data-viz="circle" title="Circle">
-          <svg viewBox="0 0 24 24" fill="currentColor">
-            <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/>
-            <circle cx="12" cy="12" r="3"/>
-          </svg>
-          <span>Circle</span>
+        <button class="viz-option viz-btn" data-viz="circle" title="Circle">
+          <i class="fas fa-circle-notch"></i>
         </button>
-        
-        <button class="viz-option" data-viz="particles" title="Particles">
-          <svg viewBox="0 0 24 24" fill="currentColor">
-            <circle cx="12" cy="5" r="2"/>
-            <circle cx="5" cy="12" r="2"/>
-            <circle cx="19" cy="12" r="2"/>
-            <circle cx="12" cy="19" r="2"/>
-            <circle cx="7" cy="7" r="1"/>
-            <circle cx="17" cy="7" r="1"/>
-            <circle cx="7" cy="17" r="1"/>
-            <circle cx="17" cy="17" r="1"/>
-          </svg>
-          <span>Particles</span>
+        <button class="viz-option viz-btn" data-viz="particles" title="Particles">
+          <i class="fas fa-braille"></i>
         </button>
-        
-        <button class="viz-option" data-viz="galaxy" title="Galaxy">
-          <svg viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
-            <path d="M12 6c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm0 10c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z"/>
-          </svg>
-          <span>Galaxy</span>
+        <button class="viz-option viz-btn" data-viz="galaxy" title="Galaxy">
+          <i class="fas fa-star"></i>
         </button>
-        
-        <button class="viz-option" data-viz="dna" title="DNA">
-          <svg viewBox="0 0 24 24" fill="currentColor">
-            <path d="M4 2v20h2V12h2v10h2V12h2v10h2V12h2v10h2V12h2V2h-2v8h-2V2h-2v8h-2V2H10v8H8V2H6v8H4V2z"/>
-          </svg>
-          <span>DNA</span>
+        <button class="viz-option viz-btn" data-viz="dna" title="DNA">
+          <i class="fas fa-dna"></i>
         </button>
-        
-        <button class="viz-option" data-viz="ribbons" title="Ribbons">
-          <svg viewBox="0 0 24 24" fill="currentColor">
-            <path d="M2 7c0-1.1.9-2 2-2h16c1.1 0 2 .9 2 2v10c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V7zm2 0v10h16V7H4z"/>
-          </svg>
-          <span>Ribbons</span>
+        <button class="viz-option viz-btn" data-viz="ribbons" title="Ribbons">
+          <i class="fas fa-stream"></i>
         </button>
-        
-        <button class="viz-option" data-viz="fractal" title="Fractal">
-          <svg viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 2l2 7h7l-5.5 4 2 7-5.5-4-5.5 4 2-7L3 9h7z"/>
-          </svg>
-          <span>Fractal</span>
+        <button class="viz-option viz-btn" data-viz="fractal" title="Fractal">
+          <i class="fas fa-snowflake"></i>
         </button>
-        
-        <button class="viz-option" data-viz="neonGrid" title="Neon Grid">
-          <svg viewBox="0 0 24 24" fill="currentColor">
-            <path d="M3 3v18h18V3H3zm16 16H5V5h14v14zM7 7h10v10H7V7zm2 2v6h6V9H9z"/>
-          </svg>
-          <span>Grid</span>
+        <button class="viz-option viz-btn" data-viz="neon" title="Neon">
+          <i class="fas fa-th"></i>
         </button>
       </div>
     </div>
 
-    <!-- Quality Selector -->
-    <div class="quality-selector" id="quality-selector">
-      <div class="quality-options">
-        <button class="quality-option" data-quality="ultra">Ultra</button>
-        <button class="quality-option active" data-quality="high">High</button>
-        <button class="quality-option" data-quality="medium">Medium</button>
-        <button class="quality-option" data-quality="low">Low</button>
-        <button class="quality-option" data-quality="auto">Auto</button>
-      </div>
-    </div>
-
-    <!-- Share Menu -->
-    <div class="share-menu" id="share-menu">
-      <div class="share-options">
-        <button class="share-option" data-action="snapshot">
-          <span>📸</span>
-          <span>Snapshot</span>
-        </button>
-        <button class="share-option" data-action="record">
-          <span>🎥</span>
-          <span>Record</span>
-        </button>
-        <button class="share-option" data-action="telegram">
-          <span>✈️</span>
-          <span>Telegram</span>
-        </button>
-      </div>
-    </div>
-
-    <!-- Error Toast -->
-    <div class="error-toast" id="error-toast">
-      <span id="error-message"></span>
+    <div class="bottom-bar">
+      <button class="action-btn" id="share-btn" title="Share">
+        <i class="fas fa-share-alt"></i>
+        <span>Share</span>
+      </button>
+      <button class="action-btn" id="record-btn" title="Record">
+        <i class="fas fa-video"></i>
+        <span>Record</span>
+      </button>
+      <button class="action-btn" id="playlist-btn" title="Playlist">
+        <i class="fas fa-list"></i>
+        <span>Playlist</span>
+      </button>
     </div>
   </div>
 
-  <!-- Scripts -->
-  <script src="audio-processor.js"></script>
-  <script src="performance.js"></script>
-  <script src="visualizer.js"></script>
-  <script src="ui-controller.js"></script>
-  <script src="app.js"></script>
+  <!-- Intro Screen -->
+  <div class="screen intro-screen active" id="intro-screen">
+    <div class="intro-content" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 20px;">
+      <div class="intro-logo" style="text-align: center; margin-bottom: 40px;">
+        <div class="logo-animation" style="position: relative; width: 150px; height: 150px; margin: 0 auto 30px;">
+          <div class="wave-circle" style="position: absolute; width: 100%; height: 100%; border: 2px solid var(--bigsis-primary); border-radius: 50%; animation: wave-expand 3s ease-out infinite;"></div>
+          <div class="wave-circle" style="position: absolute; width: 100%; height: 100%; border: 2px solid var(--bro-primary); border-radius: 50%; animation: wave-expand 3s ease-out infinite 1s;"></div>
+          <div class="wave-circle" style="position: absolute; width: 100%; height: 100%; border: 2px solid var(--lilsis-primary); border-radius: 50%; animation: wave-expand 3s ease-out infinite 2s;"></div>
+          <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 4rem;">🎵</div>
+        </div>
+        <h1 class="app-title" style="font-size: 3rem; font-weight: 800; background: linear-gradient(135deg, #512FC9, #00E0FF); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 10px;">VIBE PLAYER</h1>
+        <p class="app-tagline" style="color: rgba(255, 255, 255, 0.6); font-size: 1.1rem;">Feel the Music, See the Vibes</p>
+      </div>
+      
+      <button class="start-btn" id="start-btn">
+        <i class="fas fa-play-circle"></i> Start Vibing
+      </button>
+      
+      <div class="intro-features" style="display: flex; gap: 30px; margin-top: 40px; color: rgba(255, 255, 255, 0.8);">
+        <div class="feature" style="text-align: center;">
+          <div style="font-size: 2rem; margin-bottom: 8px;">🎨</div>
+          <div style="font-size: 0.9rem;">9 Modes</div>
+        </div>
+        <div class="feature" style="text-align: center;">
+          <div style="font-size: 2rem; margin-bottom: 8px;">🎵</div>
+          <div style="font-size: 0.9rem;">15 Tracks</div>
+        </div>
+        <div class="feature" style="text-align: center;">
+          <div style="font-size: 2rem; margin-bottom: 8px;">🎬</div>
+          <div style="font-size: 0.9rem;">Record</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Playlist Screen -->
+  <div class="screen playlist-screen" id="playlist-screen">
+    <div class="nav-header">
+      <button class="back-button" id="back-to-intro">
+        <i class="fas fa-arrow-left"></i>
+      </button>
+      <div class="nav-title">Music Library</div>
+      <div style="width: 40px;"></div>
+    </div>
+    
+    <div class="playlist-container">
+      <div class="playlist-header">
+        <h2 class="playlist-title">Vibe Tracks</h2>
+        <p class="playlist-subtitle">Select a track to start vibing</p>
+      </div>
+      
+      <div class="track-list" id="track-list">
+        <!-- Tracks will be populated here -->
+      </div>
+      
+      <div class="upload-section">
+        <label for="file-input" class="upload-btn">
+          <div class="upload-icon">📁</div>
+          <div class="upload-text">Upload Your Own Track</div>
+        </label>
+        <input type="file" id="file-input" accept="audio/*" style="display: none;">
+      </div>
+    </div>
+  </div>
+
+  <!-- Define tracks data -->
+  <script>
+    window.TRACKS = [
+      {
+        title: "Global Concepts",
+        artist: "Robert DeLong",
+        file: "audio/Robert DeLong - Global Concepts.mp3",
+        duration: "3:42",
+        icon: "🎸"
+      },
+      {
+        title: "Chlorine",
+        artist: "twenty one pilots",
+        file: "audio/twenty one pilots - Chlorine (Official Video).mp3",
+        duration: "5:24",
+        icon: "🎹"
+      },
+      {
+        title: "11 Minutes",
+        artist: "YUNGBLUD, Halsey ft. Travis Barker",
+        file: "audio/YUNGBLUD, Halsey - 11 Minutes (Official Video) ft. Travis Barker.mp3",
+        duration: "3:41",
+        icon: "🎤"
+      },
+      {
+        title: "Gasoline",
+        artist: "Halsey",
+        file: "audio/Halsey - Gasoline (Audio).mp3",
+        duration: "3:17",
+        icon: "🔥"
+      },
+      {
+        title: "High Enough",
+        artist: "K.Flay",
+        file: "audio/K.Flay - High Enough (Lyric Video).mp3",
+        duration: "3:50",
+        icon: "🌟"
+      },
+      {
+        title: "Zen",
+        artist: "X Ambassadors, K.Flay, grandson",
+        file: "audio/X Ambassadors, K.Flay, grandson - Zen.mp3",
+        duration: "3:37",
+        icon: "☯️"
+      },
+      {
+        title: "Handlebars",
+        artist: "Flobots",
+        file: "audio/Flobots - Handlebars (Official Video).mp3",
+        duration: "3:31",
+        icon: "🚴"
+      },
+      {
+        title: "Party Favor - Superhuman",
+        artist: "Party Favor (with K.Flay)",
+        file: "audio/Party Favor - Superhuman (with K.Flay) (Visualizer) [Ultra Music].mp3",
+        duration: "4:02",
+        icon: "⚡"
+      },
+      {
+        title: "Heavy",
+        artist: "Linkin Park ft. Kiiara",
+        file: "audio/Linkin Park - Heavy (feat. Kiiara) [Official Lyric Video].mp3",
+        duration: "2:49",
+        icon: "💫"
+      },
+      {
+        title: "Neon Gravestones",
+        artist: "twenty one pilots",
+        file: "audio/twenty one pilots - Neon Gravestones (Official Audio).mp3",
+        duration: "4:00",
+        icon: "🌈"
+      },
+      {
+        title: "My Blood",
+        artist: "twenty one pilots",
+        file: "audio/twenty one pilots - My Blood (Official Video).mp3",
+        duration: "3:49",
+        icon: "❤️"
+      },
+      {
+        title: "Nico And The Niners",
+        artist: "twenty one pilots",
+        file: "audio/twenty one pilots - Nico And The Niners (Official Video).mp3",
+        duration: "3:45",
+        icon: "🔥"
+      },
+      {
+        title: "The Climb Back",
+        artist: "J. Cole",
+        file: "audio/J. Cole - The Climb Back (Official Audio).mp3",
+        duration: "5:02",
+        icon: "🏔️"
+      },
+      {
+        title: "Drugs You Should Try It",
+        artist: "Travis Scott",
+        file: "audio/Travis Scott - Drugs You Should Try It (Audio).mp3",
+        duration: "3:27",
+        icon: "🌵"
+      },
+      {
+        title: "Long Time",
+        artist: "Robert DeLong",
+        file: "audio/default-song.mp3",
+        duration: "3:42",
+        icon: "🎵"
+      }
+    ];
+  </script>
+
+  <!-- Load scripts -->
+  <script src="vibe-player.js"></script>
+  <script>
+    // Simple navigation controller
+    class SimpleController {
+      constructor() {
+        this.currentTrackIndex = 0;
+        this.tracks = window.TRACKS;
+        this.vibePlayer = null;
+        this.init();
+      }
+      
+      init() {
+        // Initialize screens
+        this.introScreen = document.getElementById('intro-screen');
+        this.playlistScreen = document.getElementById('playlist-screen');
+        this.playerApp = document.getElementById('app');
+        
+        // Populate playlist
+        this.populatePlaylist();
+        
+        // Setup navigation
+        this.setupNavigation();
+        
+        // Initialize Telegram WebApp
+        const tg = window.Telegram?.WebApp;
+        if (tg) {
+          tg.ready();
+          tg.expand();
+        }
+      }
+      
+      populatePlaylist() {
+        const trackList = document.getElementById('track-list');
+        trackList.innerHTML = '';
+        
+        this.tracks.forEach((track, index) => {
+          const trackItem = document.createElement('div');
+          trackItem.className = 'track-item';
+          trackItem.innerHTML = `
+            <div class="track-icon">${track.icon}</div>
+            <div class="track-info">
+              <div class="track-name">${track.title}</div>
+              <div class="track-artist">${track.artist}</div>
+            </div>
+            <div class="track-duration">${track.duration}</div>
+          `;
+          trackItem.addEventListener('click', () => this.playTrack(index));
+          trackList.appendChild(trackItem);
+        });
+      }
+      
+      setupNavigation() {
+        // Start button
+        document.getElementById('start-btn').addEventListener('click', () => {
+          this.showScreen('playlist');
+        });
+        
+        // Back buttons
+        document.getElementById('back-to-intro').addEventListener('click', () => {
+          this.showScreen('intro');
+        });
+        
+        document.getElementById('back-to-playlist').addEventListener('click', () => {
+          if (this.vibePlayer) {
+            this.vibePlayer.stop();
+          }
+          this.showScreen('playlist');
+        });
+        
+        // Playlist button in player
+        document.getElementById('playlist-btn').addEventListener('click', () => {
+          this.showScreen('playlist');
+        });
+        
+        // Record button
+        document.getElementById('record-btn').addEventListener('click', () => {
+          alert('Recording feature coming soon! 🎬\n\nWill record visualization + audio for sharing on X (Twitter)');
+        });
+        
+        // Share button
+        document.getElementById('share-btn').addEventListener('click', () => {
+          if (window.Telegram?.WebApp) {
+            window.Telegram.WebApp.shareText('Check out Vibe Player - Amazing audio visualizer! 🎵');
+          }
+        });
+        
+        // Player controls
+        document.getElementById('prev-btn').addEventListener('click', () => this.previousTrack());
+        document.getElementById('next-btn').addEventListener('click', () => this.nextTrack());
+      }
+      
+      showScreen(screen) {
+        // Hide all screens
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        this.playerApp.style.display = 'none';
+        
+        // Show selected screen
+        switch(screen) {
+          case 'intro':
+            this.introScreen.classList.add('active');
+            break;
+          case 'playlist':
+            this.playlistScreen.classList.add('active');
+            break;
+          case 'player':
+            this.playerApp.style.display = 'block';
+            break;
+        }
+      }
+      
+      async playTrack(index) {
+        this.currentTrackIndex = index;
+        const track = this.tracks[index];
+        
+        // Show player
+        this.showScreen('player');
+        
+        // Initialize vibe player if not already
+        if (!this.vibePlayer) {
+          this.vibePlayer = new VibePlayer();
+          this.vibePlayer.init();
+        }
+        
+        // Update track info
+        document.getElementById('track-title').textContent = track.title;
+        document.getElementById('track-artist').textContent = track.artist;
+        
+        // Load and play track
+        try {
+          await this.vibePlayer.loadFile(track.file);
+        } catch (error) {
+          console.error('Error loading track:', error);
+          alert('Error loading track. Please try another one.');
+          this.showScreen('playlist');
+        }
+      }
+      
+      previousTrack() {
+        if (this.currentTrackIndex > 0) {
+          this.playTrack(this.currentTrackIndex - 1);
+        } else {
+          this.playTrack(this.tracks.length - 1);
+        }
+      }
+      
+      nextTrack() {
+        if (this.currentTrackIndex < this.tracks.length - 1) {
+          this.playTrack(this.currentTrackIndex + 1);
+        } else {
+          this.playTrack(0);
+        }
+      }
+    }
+    
+    // Initialize when DOM is ready
+    document.addEventListener('DOMContentLoaded', () => {
+      window.controller = new SimpleController();
+    });
+  </script>
 </body>
 </html>
